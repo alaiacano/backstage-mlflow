@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 import React, { useState, useEffect } from 'react';
-import { useAsync } from 'react-use';
-import { InfoCard, Progress } from '@backstage/core';
+import { InfoCard } from '@backstage/core';
 import {
   FormControl,
   FormHelperText,
@@ -33,21 +32,6 @@ import {
   Tooltip,
 } from 'recharts';
 import { Run } from '../../MLFlowClient';
-import { mlFlowClient } from '../../index';
-
-export const RunTrendPage = ({ experimentId }: { experimentId: string }) => {
-  const { value: runs, loading } = useAsync(async (): Promise<Run[]> => {
-    return mlFlowClient.searchRuns([experimentId]);
-  }, []);
-  if (loading) {
-    return <Progress />;
-  }
-  return runs ? (
-    <RunTrend runs={runs} />
-  ) : (
-    <div>No Runs Found for {experimentId}</div>
-  );
-};
 
 type MetricWithRun = {
   runId?: string;
