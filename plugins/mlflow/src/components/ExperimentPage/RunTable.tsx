@@ -147,7 +147,6 @@ export const RunTable = ({ runs }: RunTableProps) => {
     <>
       <Table
         title="Latest Runs"
-        subtitle="TODO: add metrics and maybe params"
         options={{ search: false, paging: false }}
         columns={columns}
         data={data}
