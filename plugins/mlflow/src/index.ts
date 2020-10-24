@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export { plugin } from './plugin';
+// export { plugin } from './plugin';
 export { ExperimentPage } from './components/ExperimentPage';
 export { RunTablePage } from './components/RunTablePage';
 export {
