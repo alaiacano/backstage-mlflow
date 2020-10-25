@@ -16,6 +16,7 @@
 import React, { useState, useEffect } from 'react';
 import { InfoCard, StructuredMetadataTable } from '@backstage/core';
 import {
+  Chip,
   FormControl,
   FormHelperText,
   Grid,
@@ -74,6 +75,8 @@ function runToTrendMetric(run: Run): MetricWithRun[] {
 }
 
 export const RunTrend = ({ runs }: { runs: Run[] }) => {
+  const [allEvalSets, setAllEvalSets] = useState<Set<string>>([]);
+  const [activeEvalSet, setActiveEvalSet] = useState<string>();
   const [availableMetrics, setAvailableMetrics] = useState<string[]>([]);
   const [selectedMetric, setSelectedMetric] = useState<string>('');
   const [parsedRuns, setParsedRuns] = useState<Record<string, MetricWithRun[]>>(
@@ -87,14 +90,33 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
   // mapping from (metric name) -> (array of metric values)
   useEffect(() => {
     setParsedRuns(reformatRuns(runs));
+    setAllEvalSets(
+      new Set(
+        runs.flatMap(run =>
+          run.data.tags
+            .filter(t => t.key === EVALUATION_SET_TAG)
+            .map(t => t.value),
+        ),
+      ),
+    );
   }, [runs]);
 
-  // 1. Once runs are loaded, find the available metrics and set the values in the dropdown.
   useEffect(() => {
-    const allMetrics: string[] = Object.keys(parsedRuns);
-    setAvailableMetrics(allMetrics);
-    setSelectedMetric(allMetrics[0]);
-  }, [parsedRuns]);
+    if (activeEvalSet) {
+      const newRuns = activeEvalSet
+        ? runs.filter(
+            r =>
+              r.data.tags.filter(
+                t => t.key === EVALUATION_SET_TAG && t.value === activeEvalSet,
+              ).length > 0,
+          )
+        : runs;
+      setParsedRuns(reformatRuns(newRuns));
+    } else {
+      // if it becomes inactive, set runs to the full set.
+      setParsedRuns(reformatRuns(runs));
+    }
+  }, [activeEvalSet, runs]);
 
   // 2. When a person picks a different metric, update selectedMetric
   function updateMetric(metric: string) {
@@ -103,19 +125,44 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
 
   // 3. When parsedRuns OR selectedMetric are changed, refresh the trend data used in the chart.
   useEffect(() => {
+    const allMetrics: string[] = Object.keys(parsedRuns);
+    setAvailableMetrics(allMetrics);
+    if (selectedMetric === '' || !allMetrics.includes(selectedMetric)) {
+      setSelectedMetric(allMetrics[0]);
+    }
     setTrendData(parsedRuns[selectedMetric]);
   }, [parsedRuns, selectedMetric]);
 
-  const handleDotClick = (event: any) => {
-    const metric: MetricWithRun = event.payload;
-    if (metric.runId) {
-      // Reroute!
+  const handleESClick = (es: string) => {
+    return () => {
+      if (activeEvalSet === es) {
+        setActiveEvalSet(undefined);
+      } else {
+        setActiveEvalSet(es);
+      }
+    };
+  };
+
+  const getVariant = (es: String) => {
+    if (activeEvalSet && activeEvalSet === es) {
+      return undefined;
     }
+    return 'outlined';
   };
 
   return (
     <InfoCard title="Metric trends over time">
       <Grid container direction="column" spacing={3}>
+        <Grid item>
+          {[...allEvalSets].map((es, key) => (
+            <Chip
+              onClick={handleESClick(es)}
+              variant={getVariant(es)}
+              key={key}
+              label={es}
+            />
+          ))}
+        </Grid>
         <Grid item>
           <FormControl variant="outlined">
             <Select
@@ -136,12 +183,7 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
         <Grid item>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={trendData}>
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#8884d8"
-                activeDot={{ onClick: handleDotClick }}
-              />
+              <Line type="monotone" dataKey="value" stroke="#8884d8" />
               <Tooltip content={<CustomTooltip />} />
               <CartesianGrid stroke="#ccc" />
               <XAxis dataKey="dateString" />
@@ -154,7 +196,14 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
   );
 };
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+}: {
+  active: any;
+  payload: any;
+  label: any;
+}) => {
   if (active) {
     const metric: MetricWithRun = payload[0].payload;
     const metadata = {
