@@ -15,7 +15,13 @@
  */
 import React, { useState } from 'react';
 import { useAsync } from 'react-use';
-import { Grid, TextField, Button, FormControl } from '@material-ui/core';
+import {
+  Button,
+  FormControl,
+  Grid,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import { Progress } from '@backstage/core';
 import { Run } from '../../MLFlowClient';
 import { mlFlowClient } from '../../index';
@@ -49,6 +55,34 @@ export const RunTablePage = ({
   function handleClearSearchSubmit() {
     setSearchQueryBox('');
     setSearchQuery('');
+  }
+
+  /**
+   * This returns either the RunTrend, RunTable, or a message that there are no runs for this
+   * experiment.
+   */
+  function componentToDisplay() {
+    if (!runs || runs.length < 1) {
+      return (
+        <div data-testid="NoRunsFound">
+          <Typography>
+            No runs found for this experiment. Start training some models!
+          </Typography>
+        </div>
+      );
+    }
+    if (showTrend) {
+      return (
+        <div data-testid="RunTrend">
+          <RunTrend runs={runs} />
+        </div>
+      );
+    }
+    return (
+      <div data-testid="RunTable">
+        <RunTable runs={runs} />
+      </div>
+    );
   }
 
   return (
@@ -89,9 +123,8 @@ export const RunTablePage = ({
           </Grid>
         </Grid>
       </Grid>
-      <Grid item>
-        {runs &&
-          (showTrend ? <RunTrend runs={runs} /> : <RunTable runs={runs} />)}
+      <Grid item data-testid="RunInfoItem">
+        {componentToDisplay()}
       </Grid>
     </Grid>
   );

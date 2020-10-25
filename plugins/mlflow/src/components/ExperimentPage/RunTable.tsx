@@ -27,18 +27,13 @@ import {
 import {
   Run,
   RunTag,
-  RunStatus,
   Metric,
   EVALUATION_SET_TAG,
   tagToString,
 } from '../../MLFlowClient';
 import { Chip, Button } from '@material-ui/core';
 
-type RunTableProps = {
-  runs: Run[];
-};
-
-export const RunTable = ({ runs }: RunTableProps) => {
+export const RunTable = ({ runs }: { runs: Run[] }) => {
   const [evaluationSetsToFilter, setEvaluationSetsToFilter] = useState<
     Set<string>
   >(new Set());
@@ -142,10 +137,10 @@ export const RunTable = ({ runs }: RunTableProps) => {
     setEvaluationSetsToFilter(new Set());
     setTagsToFilter(new Set());
   }
-
   return (
     <>
       <Table
+        data-testid="RunTable"
         title="Latest Runs"
         options={{ search: false, paging: false }}
         columns={columns}
@@ -163,17 +158,17 @@ export const RunTable = ({ runs }: RunTableProps) => {
   );
 };
 
-function makeStatus(status: RunStatus) {
+function makeStatus(status: string) {
   switch (status) {
-    case RunStatus.FINISHED:
+    case 'FINISHED':
       return <StatusOK />;
-    case RunStatus.FAILED:
+    case 'FAILED':
       return <StatusError />;
-    case RunStatus.KILLED:
+    case 'KILLED':
       return <StatusAborted />;
-    case RunStatus.RUNNING:
+    case 'RUNNING':
       return <StatusRunning />;
-    case RunStatus.SCHEDULED:
+    case 'SCHEDULED':
       return <StatusPending />;
     default:
       // This shouldn't happen because the match is exhaustive.

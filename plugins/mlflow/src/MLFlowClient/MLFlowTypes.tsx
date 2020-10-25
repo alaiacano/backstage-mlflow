@@ -37,26 +37,18 @@ export type Experiment = {
   tags: ExperimentTag[];
 };
 
-// https://www.mlflow.org/docs/latest/rest-api.html#mlflowrunstatus
-export enum RunStatus {
-  RUNNING = 'RUNNING',
-  SCHEDULED = 'SCHEDULED',
-  FINISHED = 'FINISHED',
-  FAILED = 'FAILED',
-  KILLED = 'KILLED',
-}
-
 // https://www.mlflow.org/docs/latest/rest-api.html#mlflowruninfo
 export type RunInfo = {
   run_id: string;
   // run_uuid: string;  - DEPRECATED
   experiment_id: string;
   user_id: string;
-  status: RunStatus;
+  // https://www.mlflow.org/docs/latest/rest-api.html#mlflowrunstatus
+  status: 'RUNNING' | 'SCHEDULED' | 'FINISHED' | 'FAILED' | 'KILLED';
   start_time: number;
   end_time: number;
   artifact_uri: string;
-  lifecycle_stage: string; // "active" or "deleted"
+  lifecycle_stage: 'active' | 'deleted';
 };
 
 export type RunTag = {
