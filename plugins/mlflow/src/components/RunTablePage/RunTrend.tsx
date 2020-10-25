@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React, { useState, useEffect } from 'react';
-import { InfoCard } from '@backstage/core';
+import { InfoCard, StructuredMetadataTable } from '@backstage/core';
 import {
   FormControl,
   FormHelperText,
@@ -31,15 +31,17 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { Run } from '../../MLFlowClient';
+import { Run, EVALUATION_SET_TAG } from '../../MLFlowClient';
 
 type MetricWithRun = {
   runId?: string;
+  userId?: string;
   key: string;
   value: number;
   timestamp: number;
   dateString: string;
   step: number;
+  evaluationSet?: string;
 };
 
 const metricWithRunSortFn = (m1: MetricWithRun, m2: MetricWithRun) => {
@@ -62,8 +64,11 @@ function runToTrendMetric(run: Run): MetricWithRun[] {
     return {
       ...m,
       runId: run.info.run_id,
+      userId: run.info.user_id,
       timestamp: parseInt(m.timestamp, 10),
       dateString: new Date(parseInt(m.timestamp, 10)).toLocaleString(),
+      evaluationSet: run.data.tags.find(t => t.key === EVALUATION_SET_TAG)
+        ?.value,
     };
   });
 }
@@ -101,6 +106,13 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
     setTrendData(parsedRuns[selectedMetric]);
   }, [parsedRuns, selectedMetric]);
 
+  const handleDotClick = (event: any) => {
+    const metric: MetricWithRun = event.payload;
+    if (metric.runId) {
+      // Reroute!
+    }
+  };
+
   return (
     <InfoCard title="Metric trends over time">
       <Grid container direction="column" spacing={3}>
@@ -124,8 +136,13 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
         <Grid item>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={trendData}>
-              <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#8884d8"
+                activeDot={{ onClick: handleDotClick }}
+              />
+              <Tooltip content={<CustomTooltip />} />
               <CartesianGrid stroke="#ccc" />
               <XAxis dataKey="dateString" />
               <YAxis />
@@ -135,4 +152,23 @@ export const RunTrend = ({ runs }: { runs: Run[] }) => {
       </Grid>
     </InfoCard>
   );
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active) {
+    const metric: MetricWithRun = payload[0].payload;
+    const metadata = {
+      [metric.key]: metric.value,
+      runId: metric.runId,
+      userId: metric.userId,
+      evaluationSet: metric.evaluationSet || 'none',
+    };
+    return (
+      <div>
+        <StructuredMetadataTable metadata={metadata} />
+      </div>
+    );
+  }
+
+  return null;
 };
