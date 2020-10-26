@@ -15,4 +15,3 @@
  */
 
 export { ExperimentPage } from './ExperimentPage';
-export { RunTable } from './RunTable';

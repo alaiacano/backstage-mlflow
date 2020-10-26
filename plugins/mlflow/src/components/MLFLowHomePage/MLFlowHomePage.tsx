@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import {
   Header,
   Page,
@@ -23,64 +23,27 @@ import {
   ContentHeader,
   HeaderLabel,
   SupportButton,
-  Progress,
 } from '@backstage/core';
 
-import { mlFlowClient } from '../../index';
-import { Experiment, Run } from '../../MLFlowClient';
-import { useAsync } from 'react-use';
-import ExperimentTable from './ExperimentTable';
-import { RunTable } from '../ExperimentPage/RunTable';
-
 export const MLFlowHomePage = () => {
-  const { value, loading } = useAsync(async (): Promise<Experiment[]> => {
-    return mlFlowClient.listExperiments();
-  }, []);
-
-  if (loading) {
-    return <Progress />;
-  }
-
   return (
     <Page theme={pageTheme.tool}>
-      <Header
-        title="Welcome to MLflow experiment tracking!"
-        subtitle="Extremely WIP"
-      >
+      <Header title="Welcome to MLflow experiment tracking!">
         <HeaderLabel label="Owner" value="@laiacano" />
         <HeaderLabel label="Lifecycle" value="Alpha" />
       </Header>
       <Content>
-        <ContentHeader title="MLFlow tracking example">
-          <SupportButton>A description of your plugin goes here.</SupportButton>
+        <ContentHeader title="MLFlow tracking documentation">
+          <SupportButton>
+            File issues/questions on github.com/alaiacano/backstage
+          </SupportButton>
         </ContentHeader>
         <Grid container spacing={3} direction="column">
           <Grid item>
-            <ExperimentTable experiments={value || []} />
+            <Typography>Docs!</Typography>
           </Grid>
-          {value && value[0] && <RunsForExperiment experiment={value[0]} />}
         </Grid>
       </Content>
     </Page>
-  );
-};
-
-type RunsForExperimentProps = { experiment: Experiment };
-
-const RunsForExperiment = ({ experiment }: RunsForExperimentProps) => {
-  const { value, loading } = useAsync(async (): Promise<Run[]> => {
-    return mlFlowClient.searchRuns([experiment.experiment_id]);
-  }, []);
-
-  if (loading) {
-    return <Progress />;
-  }
-
-  return (
-    <>
-      <Grid item>
-        <RunTable runs={value || []} />
-      </Grid>
-    </>
   );
 };

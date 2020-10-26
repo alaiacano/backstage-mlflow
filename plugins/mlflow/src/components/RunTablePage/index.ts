@@ -15,3 +15,4 @@
  */
 
 export { RunTablePage } from './RunTablePage';
+export { RunTable } from './RunTable';

@@ -25,7 +25,7 @@ import {
 import { Progress } from '@backstage/core';
 import { Run } from '../../MLFlowClient';
 import { mlFlowClient } from '../../index';
-import { RunTable } from '../ExperimentPage/RunTable';
+import { RunTable } from './RunTable';
 import { RunTrend } from './RunTrend';
 
 type RunTablePageProps = {

@@ -75,7 +75,7 @@ function runToTrendMetric(run: Run): MetricWithRun[] {
 }
 
 export const RunTrend = ({ runs }: { runs: Run[] }) => {
-  const [allEvalSets, setAllEvalSets] = useState<Set<string>>([]);
+  const [allEvalSets, setAllEvalSets] = useState<Set<string>>(new Set([]));
   const [activeEvalSet, setActiveEvalSet] = useState<string>();
   const [availableMetrics, setAvailableMetrics] = useState<string[]>([]);
   const [selectedMetric, setSelectedMetric] = useState<string>('');
