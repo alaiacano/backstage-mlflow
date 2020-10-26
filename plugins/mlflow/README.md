@@ -53,7 +53,7 @@ You can also use the search query box to put any [mlflow search query](https://w
 
 ![Filtered using search](screenshots/search-filter.png)
 
-In addition, you can view metric trends over time for all runs in this particular Experiment.
+In addition, you can view metric trends over time for all runs in this particular Experiment. If you tag Evaluation Sets in your runs, they will show up as filters on the metrics graph so you can be sure to compare models evaluated on the same hold-out set.
 
 ![Metrics trend](screenshots/metrics-trend.png)
 
