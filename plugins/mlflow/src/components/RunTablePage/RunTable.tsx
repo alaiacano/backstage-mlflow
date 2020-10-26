@@ -40,7 +40,7 @@ export const RunTable = ({ runs }: { runs: Run[] }) => {
   const [tagsToFilter, setTagsToFilter] = useState<Set<string>>(new Set());
 
   const allMetricNames: Set<string> = new Set(
-    runs.flatMap(run => run.data.metrics.map(m => m.key)),
+    runs.flatMap(run => (run.data.metrics || []).map(m => m.key)),
   );
 
   // Define the columns as the standard things and then all of the unique metric values
@@ -80,7 +80,7 @@ export const RunTable = ({ runs }: { runs: Run[] }) => {
       if (evaluationSetsToFilter.size === 0) {
         return true;
       }
-      const evalSetTag = run.data.tags.find(
+      const evalSetTag = (run.data.tags || []).find(
         tag => tag.key === EVALUATION_SET_TAG,
       );
       return evalSetTag && evaluationSetsToFilter.has(evalSetTag.value);
@@ -88,19 +88,18 @@ export const RunTable = ({ runs }: { runs: Run[] }) => {
     .filter(run => {
       return (
         tagsToFilter.size === 0 ||
-        run.data.tags.filter(tag => tagsToFilter.has(tagToString(tag))).length >
-          0
+        (run.data.tags || []).filter(tag => tagsToFilter.has(tagToString(tag)))
+          .length > 0
       );
     })
     .map(run => {
       // Extract all of the metrics into a map<key, value>
-      const metricValues: Record<string, number> = run.data.metrics.reduce(
-        (map: Record<string, number>, metric: Metric) => {
-          map[metric.key] = metric.value;
-          return map;
-        },
-        {},
-      );
+      const metricValues: Record<string, number> = (
+        run.data.metrics || []
+      ).reduce((map: Record<string, number>, metric: Metric) => {
+        map[metric.key] = metric.value;
+        return map;
+      }, {});
 
       // build all of the rest of the colums and add in the metrics at the end.
       return {

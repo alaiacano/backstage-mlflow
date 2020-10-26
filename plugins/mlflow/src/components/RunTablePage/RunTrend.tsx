@@ -32,7 +32,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { Run, EVALUATION_SET_TAG } from '../../MLFlowClient';
+import { Metric, Run, RunTag, EVALUATION_SET_TAG } from '../../MLFlowClient';
 
 type MetricWithRun = {
   runId?: string;
@@ -61,15 +61,16 @@ function reformatRuns(runs: Run[]): Record<string, MetricWithRun[]> {
   return keyToMetricSeries;
 }
 function runToTrendMetric(run: Run): MetricWithRun[] {
-  return run.data.metrics.map(m => {
+  const metrics: Metric[] = run.data.metrics || [];
+  const tags: RunTag[] = run.data.tags || [];
+  return metrics.map(m => {
     return {
       ...m,
       runId: run.info.run_id,
       userId: run.info.user_id,
       timestamp: parseInt(m.timestamp, 10),
       dateString: new Date(parseInt(m.timestamp, 10)).toLocaleString(),
-      evaluationSet: run.data.tags.find(t => t.key === EVALUATION_SET_TAG)
-        ?.value,
+      evaluationSet: tags.find(t => t.key === EVALUATION_SET_TAG)?.value,
     };
   });
 }
