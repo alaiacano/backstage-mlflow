@@ -45,8 +45,8 @@ export type RunInfo = {
   user_id: string;
   // https://www.mlflow.org/docs/latest/rest-api.html#mlflowrunstatus
   status: 'RUNNING' | 'SCHEDULED' | 'FINISHED' | 'FAILED' | 'KILLED';
-  start_time: number;
-  end_time: number;
+  start_time: string;
+  end_time: string;
   artifact_uri: string;
   lifecycle_stage: 'active' | 'deleted';
 };

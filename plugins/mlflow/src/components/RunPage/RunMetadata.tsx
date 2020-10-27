@@ -19,13 +19,12 @@ import {
   Button,
   FormControl,
   FormGroup,
-  // Modal,
   TextField,
   Theme,
 } from '@material-ui/core';
-import { Run, RunTag } from '../../MLFlowClient';
+import { Run, RunTag, runNameOrId } from '../../MLFlowClient';
 import { mlFlowClient } from '../../index';
-import { InfoCard, Link, StructuredMetadataTable } from '@backstage/core';
+import { InfoCard, StructuredMetadataTable } from '@backstage/core';
 import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles<Theme>(() => ({
@@ -80,7 +79,6 @@ const RunMetadata = ({ run }: RunMetadataProps) => {
   );
 
   const metadataInfo = {
-    experimentName: experimentName,
     status: run.info.status,
     submittedBy: run.info.user_id,
     startTime: new Date(parseInt(run.info.start_time, 10)).toLocaleString(),
@@ -91,7 +89,7 @@ const RunMetadata = ({ run }: RunMetadataProps) => {
   };
 
   return (
-    <InfoCard title="Run Details">
+    <InfoCard title="Run Details" subheader={runNameOrId(run)}>
       <StructuredMetadataTable metadata={metadataInfo} />
       {open && (
         <NewNoteForm

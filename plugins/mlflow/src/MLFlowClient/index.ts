@@ -16,7 +16,7 @@
 
 export * from './MLFlowTypes';
 export * from './MLFlowClient';
-import { RunTag } from './MLFlowTypes';
+import { Run, RunTag } from './MLFlowTypes';
 
 export function tagToString(runTag: RunTag): string {
   return `${runTag.key}:${runTag.value}`;
@@ -28,4 +28,11 @@ export function stringToTag(tagString: string): RunTag | undefined {
     return { key: key, value: value };
   }
   return undefined;
+}
+
+export function runNameOrId(run: Run): string {
+  const runTag: RunTag | undefined = (run.data.tags || []).find(
+    tag => tag.key === 'mlflow.runName',
+  );
+  return runTag ? runTag.value : run.info.run_id;
 }

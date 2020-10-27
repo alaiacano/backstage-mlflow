@@ -201,9 +201,9 @@ const CustomTooltip = ({
   active,
   payload,
 }: {
-  active: any;
-  payload: any;
-  label: any;
+  active?: any;
+  payload?: any;
+  label?: any;
 }) => {
   if (active) {
     const metric: MetricWithRun = payload[0].payload;

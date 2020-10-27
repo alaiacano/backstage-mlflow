@@ -30,6 +30,7 @@ import {
   Metric,
   EVALUATION_SET_TAG,
   tagToString,
+  runNameOrId,
 } from '../../MLFlowClient';
 import { Chip, Button } from '@material-ui/core';
 
@@ -46,7 +47,7 @@ export const RunTable = ({ runs }: { runs: Run[] }) => {
   // Define the columns as the standard things and then all of the unique metric values
   const columns: TableColumn[] = [
     { title: 'Status', field: 'status', width: '40px' },
-    { title: 'Run ID', field: 'run_id' },
+    { title: 'Run Name/ID', field: 'run_id' },
     { title: 'Start Time', field: 'start_time' },
     { title: 'Lifecycle', field: 'lifecycle_stage' },
     { title: 'Evaluation Sets', field: 'evaluation_sets' },
@@ -104,8 +105,10 @@ export const RunTable = ({ runs }: { runs: Run[] }) => {
       // build all of the rest of the colums and add in the metrics at the end.
       return {
         status: makeStatus(run.info.status),
-        run_id: <Link to={`${run.info.run_id}`}>{run.info.run_id}</Link>,
-        start_time: new Date(run.info.start_time * 1).toLocaleString(),
+        run_id: <Link to={`${run.info.run_id}`}>{runNameOrId(run)}</Link>,
+        start_time: new Date(
+          parseInt(run.info.start_time, 10),
+        ).toLocaleString(),
         lifecycle_stage: run.info.lifecycle_stage,
         tags: run.data.tags
           .filter(tag => !tag.key.startsWith('mlflow.'))
