@@ -112,7 +112,7 @@
     "@types/rollup-plugin-postcss": "^2.0.0",
     "@types/tar": "^4.0.3",
     "@types/webpack": "^4.41.7",
-    "@types/webpack-dev-server": "^3.11.0",
+    "@types/webpack-dev-server": "^4.7.2",
     "del": "^5.1.0",
     "mock-fs": "^4.13.0",
     "nodemon": "^2.0.2",
